@@ -111,7 +111,9 @@ Exiting..."
     fi
   fi
 
+  #if ! [ -z $b ]; then
   if [ -n "$b" ]; then
+    #if ! [ -e $b ]; then
     if ! [ -e "$b" ]; then
       echo "
 ---------------------------------------------------------------------------------------------------
@@ -147,9 +149,10 @@ Please notedown the correct file path of the Image and then run this script.
   gresource extract $source $prefix/icons/scalable/actions/pointer-double-click-symbolic.svg >$dest/icons/scalable/actions/pointer-double-click-symbolic.svg
   gresource extract $source $prefix/icons/scalable/actions/eye-open-negative-filled-symbolic.svg >$dest/icons/scalable/actions/eye-open-negative-filled-symbolic.svg
 
+  # shellcheck disable=SC2086 # for IntelliJ IDEA
   echo '@import url("resource:///org/gnome/shell/theme/original.css");
   #lockDialogGroup {
-  background: '"$color"' url(file://'"$b"');
+  background: '$color' url(file://'$b');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center; }' >$dest/gdm3.css
@@ -179,9 +182,10 @@ Please notedown the correct file path of the Image and then run this script.
   </gresource>
 </gresources>' >$dest/focalgdm3.gresource.xml
 
-  cd "$dest" 2>/dev/null || echo "An error has occurred within the script: No such directory \"$dest\"" && exit 1
+  cd "$dest" || exit
   glib-compile-resources focalgdm3.gresource.xml
   mv focalgdm3.gresource ..
+  cd ..
   rm -r $dest
   update-alternatives --quiet --install /usr/share/gnome-shell/gdm3-theme.gresource gdm3-theme.gresource /usr/local/share/gnome-shell/theme/focalgdm3.gresource 0
   update-alternatives --quiet --set gdm3-theme.gresource /usr/local/share/gnome-shell/theme/focalgdm3.gresource
@@ -204,7 +208,7 @@ Please notedown the correct file path of the Image and then run this script.
   if [ -e /usr/local/share/gnome-shell/theme/focalgdm3.gresource ]; then
     rm /usr/local/share/gnome-shell/theme/focalgdm3.gresource
     update-alternatives --quiet --set gdm3-theme.gresource "$source"
-    cd /usr/local/share 2>/dev/null || echo "An error has occurred within the script: No such directory \"/usr/local/share\"" && exit 1
+    cd /usr/local/share || exit
     rmdir --ignore-fail-on-non-empty -p gnome-shell/theme
     echo "
 				     		---------------
@@ -213,7 +217,8 @@ Please notedown the correct file path of the Image and then run this script.
   else
     echo "
 -----------------------------------------------------------------------------
-No need, Alread -ry Reset. (or unlikely background is not set using this Script.)
+No need, Already Reset. (May need a reboot if you have changed the background without doing so
+                          or the background was set by another script or the OS itself.)
 -----------------------------------------------------------------------------"
     exit 1
   fi
