@@ -14,15 +14,26 @@ Exiting...
 exit 1
 fi
 
+if [ "$UID" != "0" ]
+then
+echo -e "This Script must be run with root privileges; example: \"sudo ./focalgdm3\""
+exit 1
+fi
+
 pkg=$(dpkg -l | grep libglib2.0-dev >/dev/null && echo "yes" || echo "no")
 if [ "$pkg" == "no" ]
 then
 echo "
 -----------------------------------------------------------------------------------------------------
 Sorry, the package 'libglib2.0-dev' is not installed. Install the package and then run this Script.
-For now, Exiting...
 -----------------------------------------------------------------------------------------------------"
-exit 1
+echo "Would you like to install libglib2.0-dev? y/N"
+read ans
+  if [ "$ans" == "y" ] || [ "$ans" == "Y" ]; then
+    apt install libglib2.0-dev
+  else
+    exit 1
+  fi
 fi
 
 ############################################################################################
@@ -30,12 +41,6 @@ case "$1" in ###################################################################
 ############################################################################################
 --set)
 ############################################################################################
-
-if [ "$UID" != "0" ]
-then
-echo "This Script must be run with sudo"
-exit 1
-fi
 
 echo "
 -------------------------------------------------------------------------------------------------------
@@ -229,6 +234,6 @@ fi
 ############################################################################################
 *) #########################################################################################
 ############################################################################################
-echo "Use the parameter '--set' or '--reset'; example: './focalgdm3 --set' or './focalgdm3 --reset'"
+echo -e "\nUse the parameter '--set' or '--reset'; example: './focalgdm3 --set' or './focalgdm3 --reset'\n"
 exit 1
 esac
